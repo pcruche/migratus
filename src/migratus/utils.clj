@@ -39,8 +39,12 @@
   [script migration-dir exclude-scripts]
   (when (seq exclude-scripts)
     (let [fs (if (instance? File migration-dir)
-               (.getFileSystem (.toPath migration-dir))
-               (let [uri (URI. (str "jar:file:" (.getName ^JarFile migration-dir)))]
+               (FileSystems/getDefault)
+               (let [uri (URI. (str "jar:"
+                                    (-> migration-dir
+                                        .getName
+                                        io/file
+                                        .toURI)))]
                  (try
                    (FileSystems/getFileSystem uri)
                    (catch FileSystemNotFoundException _
